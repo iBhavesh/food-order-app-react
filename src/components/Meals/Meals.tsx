@@ -1,5 +1,13 @@
+import AvailableMeals from "./AvailableMeals/AvailableMeals";
+import MealsSummry from "./MealsSummary/MealsSummry";
+
 const Meals = () => {
-  return <div></div>;
+  return (
+    <>
+      <MealsSummry />
+      <AvailableMeals />
+    </>
+  );
 };
 
 export default Meals;
