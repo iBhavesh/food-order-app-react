@@ -5,7 +5,7 @@ import Meals from "./components/Meals/Meals";
 import CartProvider from "./store/CartProvider";
 
 function App() {
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const closeModal = () => {
     setShowModal(false);
   };

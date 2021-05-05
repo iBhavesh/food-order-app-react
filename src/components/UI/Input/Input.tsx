@@ -1,3 +1,4 @@
+import React from "react";
 import classes from "./Input.module.css";
 
 type Props = {
@@ -8,13 +9,11 @@ type Props = {
   >;
 };
 
-const Input = (props: Props) => {
-  return (
-    <div className={classes.input}>
-      <label htmlFor={props.input.id}>{props.label}</label>
-      <input {...props.input} />
-    </div>
-  );
-};
+const Input = React.forwardRef<HTMLInputElement, Props>((props, ref) => (
+  <div className={classes.input}>
+    <label htmlFor={props.input.id}>{props.label}</label>
+    <input {...props.input} ref={ref} />
+  </div>
+));
 
 export default Input;
