@@ -5,6 +5,23 @@
   animation: meals-appear 1s ease-out forwards;
 }
 
+.meals-loading {
+  max-width: 60rem;
+  width: 90%;
+  text-align: center;
+  margin: 2rem auto;
+  animation: meals-appear 1s ease-out forwards;
+}
+
+.meals-error {
+  max-width: 60rem;
+  width: 90%;
+  color: red;
+  text-align: center;
+  margin: 2rem auto;
+  animation: meals-appear 1s ease-out forwards;
+}
+
 .meals ul {
   list-style: none;
   margin: 0;

@@ -1,40 +1,54 @@
+import { useEffect, useState } from "react";
+
 import classes from "./AvailableMeals.module.css";
 import Meal from "../../../model/meal";
 import MealItem from "./MealItem/MealItem";
 import Card from "../../UI/Card/Card";
-
-const DUMMY_MEALS: Meal[] = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
+import useHttp from "../../../hooks/useHttp";
 
 const AvailableMeals = () => {
-  const mealsList = DUMMY_MEALS.map((meal) => (
-    <MealItem key={meal.id} meal={meal} />
-  ));
+  const [MEALS, setMEALS] = useState<Meal[]>([]);
+  const { isLoading, httpError, sendRequest } = useHttp();
 
+  useEffect(() => {
+    const postRequest = (data: any) => {
+      let loadedMeals: Meal[] = [];
+      for (const key in data) {
+        loadedMeals.push({
+          id: key,
+          name: data[key].name,
+          description: data[key].description,
+          price: +data[key].price,
+        });
+      }
+      setMEALS(loadedMeals);
+    };
+
+    sendRequest(
+      process.env.REACT_APP_FIREBASE_URL + "meals.json",
+      {},
+      postRequest
+    );
+  }, [sendRequest]);
+  if (isLoading) {
+    return (
+      <section className={classes["meals-loading"]}>
+        <Card>
+          <h2>Loading...</h2>
+        </Card>
+      </section>
+    );
+  } else if (httpError) {
+    return (
+      <section className={classes["meals-error"]}>
+        <Card>
+          <h2>{httpError}</h2>
+        </Card>
+      </section>
+    );
+  }
+
+  const mealsList = MEALS.map((meal) => <MealItem key={meal.id} meal={meal} />);
   return (
     <section className={classes.meals}>
       <Card>
