@@ -9,7 +9,8 @@ const initialState: { items: CartItem[]; totalAmount: number } = {
 
 type ACTIONTYPE =
   | { type: "ADD_ITEM"; item: CartItem }
-  | { type: "REMOVE_ITEM"; id: string };
+  | { type: "REMOVE_ITEM"; id: string }
+  | { type: "CLEAR_CART" };
 
 const cartReducer = (state: typeof initialState, action: ACTIONTYPE) => {
   switch (action.type) {
@@ -55,6 +56,8 @@ const cartReducer = (state: typeof initialState, action: ACTIONTYPE) => {
       }
       return { items: updatedItems, totalAmount: updatedtotalAmount };
     }
+    case "CLEAR_CART":
+      return initialState;
     default:
       return initialState;
   }
@@ -71,11 +74,16 @@ const CartProvider: React.FC = (props) => {
     dispatchCartAction({ type: "REMOVE_ITEM", id: id });
   };
 
+  const clearCart = () => {
+    dispatchCartAction({ type: "CLEAR_CART" });
+  };
+
   const cartContextHelper = {
     items: cartState.items,
     totalAmount: cartState.totalAmount,
     addItem: addItemToCart,
     removeItem: removeItemFromCart,
+    clearCart: clearCart,
   };
 
   return (

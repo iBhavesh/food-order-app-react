@@ -1,9 +1,13 @@
 import { useRef, useState } from "react";
+import UserData from "../../../model/userData";
 import classes from "./Checkout.module.css";
 import FormInput from "./FormInput/FormInput";
 
 type Props = {
   onCancel: () => void;
+  onConfirm: (userData: UserData) => void;
+  httpError: string | null;
+  isLoading: boolean;
 };
 
 const isNotEmpty = (value: string) => value.trim() !== "";
@@ -46,8 +50,36 @@ const Checkout = (props: Props) => {
     if (!formIsValid) {
       return;
     }
-  };
 
+    props.onConfirm({
+      name: enteredName,
+      street: enteredStreet,
+      city: enteredCity,
+      postalCode: enteredPostal,
+    });
+  };
+  let actions = (
+    <div className={classes.actions}>
+      <button type="button" onClick={props.onCancel}>
+        Cancel
+      </button>
+      <button className={classes.submit}>Confirm</button>
+    </div>
+  );
+  if (props.httpError) {
+    actions = (
+      <>
+        <h2 style={{ color: "red" }}>Ooops! Something went wrong.</h2>
+        <div className={classes.actions}>
+          <button type="button" onClick={props.onCancel}>
+            Cancel
+          </button>
+        </div>
+      </>
+    );
+  } else if (props.isLoading) {
+    actions = <h2>Placind order..</h2>;
+  }
   return (
     <form className={classes.form} onSubmit={confirmHandler}>
       <FormInput
@@ -90,12 +122,7 @@ const Checkout = (props: Props) => {
           id: "city",
         }}
       />
-      <div className={classes.actions}>
-        <button type="button" onClick={props.onCancel}>
-          Cancel
-        </button>
-        <button className={classes.submit}>Confirm</button>
-      </div>
+      {actions}
     </form>
   );
 };

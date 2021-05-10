@@ -6,6 +6,7 @@ type CartContextInterface = {
   totalAmount: number;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
+  clearCart: () => void;
 };
 const CartContext = createContext<CartContextInterface | null>(null);
 

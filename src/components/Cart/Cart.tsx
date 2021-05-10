@@ -5,6 +5,8 @@ import CartItem from "./CartItem/CartItem";
 import classes from "./Cart.module.css";
 import cartItem from "../../model/cartItem";
 import Checkout from "./Checkout/Checkout";
+import UserData from "../../model/userData";
+import useHttp from "../../hooks/useHttp";
 
 type Props = {
   onClose: () => void;
@@ -14,6 +16,8 @@ const Cart = (props: Props) => {
   const totalAmount = cartCtx!.totalAmount.toFixed(2);
   const hasItems = cartCtx!.items.length > 0;
   const [isCheckout, setIsCheckout] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const { httpError, isLoading, sendRequest } = useHttp();
 
   const cartItemRemoveHandler = (id: string) => {
     cartCtx?.removeItem(id);
@@ -23,10 +27,33 @@ const Cart = (props: Props) => {
     cartCtx?.addItem({ ...item, amount: 1 });
   };
 
+  const closeModal = () => {
+    props.onClose();
+  };
+
   const orderButtonHandler: React.MouseEventHandler<HTMLButtonElement> = (
     event
   ) => {
     setIsCheckout(true);
+  };
+
+  const submitOrderHandler = async (userData: UserData) => {
+    const postRequest = (data: any) => {
+      cartCtx!.clearCart();
+      setOrderPlaced(true);
+    };
+
+    sendRequest(
+      process.env.REACT_APP_FIREBASE_URL! + "orders.json",
+      {
+        body: JSON.stringify({
+          userData: userData,
+          orderItems: cartCtx!.items,
+        }),
+        method: "POST",
+      },
+      postRequest
+    );
   };
 
   const cartItems = (
@@ -46,7 +73,7 @@ const Cart = (props: Props) => {
 
   const modalActions = (
     <div className={classes.actions}>
-      <button onClick={props.onClose} className={classes["button--alt"]}>
+      <button onClick={closeModal} className={classes["button--alt"]}>
         Close
       </button>
       {hasItems && (
@@ -57,15 +84,36 @@ const Cart = (props: Props) => {
     </div>
   );
 
+  if (orderPlaced) {
+    return (
+      <Modal onClose={closeModal}>
+        <h2>Order placed!</h2>
+        <div className={classes.actions}>
+          <button onClick={closeModal} className={classes["button--alt"]}>
+            Close
+          </button>
+        </div>
+      </Modal>
+    );
+  }
+
   return (
-    <Modal onClose={props.onClose}>
-      {cartItems}
+    <Modal onClose={closeModal}>
+      {!isCheckout && cartItems}
       <div className={classes.total}>
         <span>Total Amount</span>
         <span>&#8377;{totalAmount}</span>
       </div>
-      {isCheckout && <Checkout onCancel={props.onClose} />}
+      {isCheckout && !isLoading && (
+        <Checkout
+          httpError={httpError}
+          isLoading={isLoading}
+          onConfirm={submitOrderHandler}
+          onCancel={closeModal}
+        />
+      )}
       {!isCheckout && modalActions}
+      {isLoading && <h2>Placing Order....</h2>}
     </Modal>
   );
 };
